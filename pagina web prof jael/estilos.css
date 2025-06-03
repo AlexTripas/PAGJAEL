@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(to bottom right, #0a0f1c, #02141f);
+  font-family: 'Orbitron', sans-serif;
+  color: #00ffff;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.reproductor {
+  background: rgba(0, 255, 255, 0.05);
+  border: 2px solid #00ffff88;
+  border-radius: 20px;
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 0 15px #00ffff33;
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.portada {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 0 12px #00ffff55;
+  margin-bottom: 15px;
+}
+
+.titulo {
+  font-size: 1.3em;
+  color: #00f0ff;
+  margin-bottom: 5px;
+}
+
+.artista {
+  font-size: 0.9em;
+  color: #88faff;
+  margin-bottom: 15px;
+}
+
+.barras-musica {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 35px;
+  margin: 15px 0;
+}
+
+.barra {
+  width: 6px;
+  height: 10px;
+  background: #00ffff;
+  border-radius: 3px;
+  animation: saltar 1s infinite ease-in-out alternate;
+  box-shadow: 0 0 5px #00ffff88;
+}
+
+.barra:nth-child(2) { animation-delay: 0.1s; }
+.barra:nth-child(3) { animation-delay: 0.2s; }
+.barra:nth-child(4) { animation-delay: 0.3s; }
+.barra:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes saltar {
+  from { height: 10px; }
+  to { height: 35px; }
+}
+
+.controles button {
+  background: rgba(0, 255, 255, 0.1);
+  border: 2px solid #00ffffaa;
+  color: #00ffff;
+  font-size: 1.5em;
+  border-radius: 10px;
+  padding: 5px 10px;
+  margin: 0 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 0 5px #00ffff44;
+}
+
+.controles button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  transform: scale(1.1);
+}

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🎮 REPark - Deezer Reproductor Vivo y Estilizado</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0;
+    height: 100vh;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(to bottom, #010A13, #021B34);
+    color: #00f7ff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  h1 {
+    margin: 10px 20px 0 20px;
+    font-size: 2.4rem;
+    color: #ff66cc;
+    text-shadow: 0 0 15px #ff99cc;
+    user-select: none;
+  }
+  /* Contenedor de búsqueda */
+  .busqueda-container {
+    display: flex;
+    margin: 15px 20px 0 20px;
+    gap: 10px;
+    align-items: center;
+  }
+  #buscar {
+    flex: 1;
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: none;
+    background-color: #061a2e;
+    color: #aef;
+    outline: none;
+    box-shadow: 0 0 10px #ff99cc;
+  }
+  #buscar::placeholder {
+    color: #ffb3d9;
+  }
+  button#btn-buscar {
+    background-color: #ff66cc;
+    border: none;
+    padding: 11px 25px;
+    font-size: 1.1rem;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 12px #ff99cc;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  button#btn-buscar:hover {
+    background-color: #ffb3d9;
+  }
+  /* Contenedor principal con lado derecho lista y lado izquierdo reproductor */
+  .main-container {
+    flex: 1;
+    display: flex;
+    background: #021b34cc;
+    box-shadow: 0 0 40px #00ffeeaa inset;
+    margin: 20px;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+  }
+  /* Lista de canciones a la derecha */
+  #resultados {
+    width: 320px;
+    background: #031c3a;
+    border-left: 2px solid #ff99ccaa;
+    overflow-y: auto;
+    padding: 15px;
+    box-shadow: inset 0 0 20px #00ffee88;
+    order: 2;
+  }
+  /* Reproductor principal a la izquierda */
+  .player-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 20px 110px 20px; /* espacio para controles abajo */
+    position: relative;
+    background: linear-gradient(45deg, #021b34, #031c3a);
+    border-radius: 15px 0 0 15px;
+    box-shadow: inset 0 0 30px #00ffeeaa;
+    order: 1;
+    overflow: hidden;
+  }
+  /* Información de la canción */
+  .song-info {
+    margin: auto;
+    text-align: center; /* Centrado */
+    position: relative;
+    z-index: 3;
+    user-select: none;
+  }
+  .song-info h2 {
+    margin: 8px 0 6px 0;
+    color: #ff66cc;
+    text-shadow: 0 0 12px #ff99ccdd;
+    user-select: text;
+    font-size: 2rem; /* Aumentado */
+  }
+  .song-info h3 {
+    margin: 0;
+    color: #00ffeecc;
+    font-weight: 400;
+    user-select: text;
+    font-size: 1.5rem; /* Aumentado */
+  }
+  .song-info img {
+    margin-top: 20px;
+    width: 260px;
+    border-radius: 18px;
+    box-shadow: 0 0 40px #00ffeecc;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* Barra de progreso visible arriba de controles */
+  .progress-container {
+    position: absolute;
+    bottom: 85px;
+    left: 20px;
+    right: 20px;
+    height: 14px;
+    background: #061a2e;
+    border-radius: 14px;
+    box-shadow: inset 0 0 10px #00ffeeaa;
+    cursor: pointer;
+    z-index: 5;
+  }
+  .progress {
+    height: 100%;
+    background: #ff66cc; /* Restaurado a rosa */
+    width: 0%;
+    border-radius: 14px;
+    box-shadow: 0 0 15px #ff99ccbb;
+    transition: width 0.1s linear;
+  }
+  /* Controles abajo pegados a la base */
+  .controls-bottom {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: auto;
+    z-index: 5;
+    gap: 20px;
+  }
+  .buttons-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  button.control-btn {
+    background: #fa4ec1; /* Restaurado a rosa */
+    border: none;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 16px;
+    font-size: 1.6rem;
+    cursor: pointer;
+    box-shadow: 0 0 20px #0e0d0ddd;
+    transition: background-color 0.25s ease;
+  }
+  button.control-btn:hover {
+    background-color: #ffb3d9;
+  }
+  /* Control de volumen tipo barra vertical a la derecha del control */
+  .volume-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .volume-label {
+    font-size: 1rem;
+    color: #00ffeecc;
+  }
+  input[type=range].volume-slider {
+    -webkit-appearance: none;
+    width: 130px;
+    height: 8px;
+    background: #061a2e;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px #00ffeecc;
+    cursor: pointer;
+  }
+  input[type=range].volume-slider:focus {
+    outline: none;
+    box-shadow: 0 0 18px #00ffeeee;
+  }
+  input[type=range].volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #ff66cc; /* Restaurado a rosa */
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 14px #ff99ccbb;
+  }
+  input[type=range].volume-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #ff66cc; /* Restaurado a rosa */
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 14px #ff99ccbb;
+  }
+  /* Tiempo */
+  .time-display {
+    font-family: monospace;
+    font-size: 1.2rem;
+    min-width: 70px;
+    text-align: center;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+  <h1>🎮 REPARK</h1>
+  <div class="busqueda-container">
+    <input type="text" id="buscar" placeholder="Buscar canción o artista" aria-label="Buscar canción o artista" autocomplete="off" />
+    <button id="btn-buscar" aria-label="Buscar canción o artista">Buscar</button>
+  </div>
+  <div class="main-container" role="main">
+    <div class="player-container" aria-label="Reproductor de música">
+      <div class="song-info" aria-live="polite" aria-atomic="true">
+        <h2 id="titulo" aria-label="Título de la canción"></h2>
+        <h3 id="artista" aria-label="Nombre del artista"></h3>
+        <img id="cover" src="" alt="Portada del álbum" style="display:none" />
+      </div>
+      <audio id="audio" preload="auto"></audio>
+      <div class="progress-container" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Barra de progreso de la canción" id="progress-container">
+        <div id="progress" class="progress"></div>
+      </div>
+      <div class="controls-bottom" role="group" aria-label="Controles de reproducción y volumen">
+        <div class="buttons-row">
+          <button id="btn-prev" class="control-btn" aria-label="Canción anterior">⏮</button>
+          <button id="btn-play" class="control-btn" aria-label="Reproducir/Pausar">▶</button>
+          <button id="btn-next" class="control-btn" aria-label="Canción siguiente">⏭</button>
+          <div id="current-time" class="time-display" aria-live="off" aria-atomic="true">0:00</div>
+          <div id="duration" class="time-display" aria-live="off" aria-atomic="true">0:00</div>
+        </div>
+        <div class="volume-container">
+          <label for="volume-slider" class="volume-label">Volumen</label>
+          <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.01" aria-label="Control de volumen" />
+        </div>
+      </div>
+    </div>
+    <div id="resultados" aria-label="Lista de canciones" role="list"></div>
+  </div>
+<script>
+  let canciones = [];
+  let cancionActualIndex = -1;
+  const audio = document.getElementById("audio");
+  const resultadosDiv = document.getElementById("resultados");
+  const currentTimeDisplay = document.getElementById("current-time");
+  const durationDisplay = document.getElementById("duration");
+  const playBtn = document.getElementById("btn-play");
+  const prevBtn = document.getElementById("btn-prev");
+  const nextBtn = document.getElementById("btn-next");
+  const volumeSlider = document.getElementById("volume-slider");
+  const titulo = document.getElementById("titulo");
+  const artista = document.getElementById("artista");
+  const cover = document.getElementById("cover");
+  const progress = document.getElementById("progress");
+  const progressContainer = document.getElementById("progress-container");
+
+  // Inicializar volumen medio
+  audio.volume = 0.5;
+  volumeSlider.value = 0.5;
+
+  volumeSlider.addEventListener("input", (e) => {
+    audio.volume = e.target.value;
+  });
+
+  // Función para buscar canciones con JSONP (callback procesarDatos)
+  function buscarCanciones() {
+    const query = document.getElementById("buscar").value.trim();
+    if (!query) {
+      alert("Por favor, ingrese un término de búsqueda.");
+      return;
+    }
+    const oldScript = document.getElementById("jsonpScript");
+    if (oldScript) oldScript.remove();
+    const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=procesarDatos`;
+    const script = document.createElement("script");
+    script.src = url;
+    script.id = "jsonpScript";
+    document.body.appendChild(script);
+  }
+  document.getElementById("btn-buscar").addEventListener("click", buscarCanciones);
+
+  // Callback JSONP que procesa datos y muestra resultados
+  function procesarDatos(data) {
+    if (!data || !data.data || data.data.length === 0) {
+      resultadosDiv.innerHTML = "<p style='color:#ff4466; padding:20px; font-weight:bold;'>No se encontraron resultados.</p>";
+      canciones = [];
+      cancionActualIndex = -1;
+      actualizarInfoCancion(null);
+      return;
+    }
+    canciones = data.data;
+    cancionActualIndex = -1;
+    resultadosDiv.innerHTML = "";
+    canciones.forEach((track, i) => {
+      const item = document.createElement("div");
+      item.className = "cancion-item";
+      item.setAttribute("role","listitem");
+      item.tabIndex = 0;
+      item.innerHTML = `
+        <img src="${track.album.cover_medium}" alt="Portada del álbum" />
+        <div class="cancion-info">
+          <strong>${track.title}</strong>
+          <span>${track.artist.name}</span>
+        </div>
+      `;
+      item.addEventListener("click", () => seleccionarCancion(i));
+      item.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          seleccionarCancion(i);
+        }
+      });
+      resultadosDiv.appendChild(item);
+    });
+  }
+
+  function seleccionarCancion(index) {
+    if (index === cancionActualIndex) {
+      togglePlayPause();
+      return;
+    }
+    if(index < 0 || index >= canciones.length) return;
+    cancionActualIndex = index;
+    Array.from(resultadosDiv.children).forEach((el, idx) => {
+      if (idx === index) el.classList.add("active");
+      else el.classList.remove("active");
+    });
+    const track = canciones[index];
+    actualizarInfoCancion(track);
+    audio.src = track.preview;
+    audio.play().catch(()=>{});
+    playBtn.textContent = "⏸";
+  }
+  function togglearCancionSiguiente() {
+    if (cancionActualIndex === -1 || canciones.length === 0) return;
+    const nuevoIndex = (cancionActualIndex + 1) % canciones.length;
+    seleccionarCancion(nuevoIndex);
+  }
+  function togglearCancionAnterior() {
+    if (cancionActualIndex === -1 || canciones.length === 0) return;
+    const nuevoIndex = (cancionActualIndex - 1 + canciones.length) % canciones.length;
+    seleccionarCancion(nuevoIndex);
+  }
+  function actualizarInfoCancion(track) {
+    if (!track) {
+      titulo.textContent = "";
+      artista.textContent = "";
+      cover.style.display = "none";
+      cover.src = "";
+      playBtn.textContent = "▶";
+      currentTimeDisplay.textContent = "0:00";
+      durationDisplay.textContent = "0:00";
+      progress.style.width = "0%"; // Reiniciar barra de progreso
+      return;
+    }
+    titulo.textContent = track.title;
+    artista.textContent = track.artist.name;
+    cover.src = track.album.cover_medium;
+    cover.style.display = "inline-block";
+  }
+  function togglePlayPause() {
+    if (!audio.src) return;
+    if (audio.paused) {
+      audio.play();
+      playBtn.textContent = "⏸";
+    } else {
+      audio.pause();
+      playBtn.textContent = "▶";
+    }
+  }
+  audio.addEventListener('timeupdate', ()=> {
+    if (!audio.duration) return;
+    currentTimeDisplay.textContent = formatoTiempo(audio.currentTime);
+    durationDisplay.textContent = formatoTiempo(audio.duration);
+    const progressPercentage = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = `${progressPercentage}%`; // Actualizar barra de progreso
+  });
+  audio.addEventListener('ended', () => {
+    togglearCancionSiguiente();
+  });
+  function formatoTiempo(segundos) {
+    const min = Math.floor(segundos / 60) || 0;
+    const sec = Math.floor(segundos % 60) || 0;
+    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+  }
+  playBtn.addEventListener("click", togglePlayPause);
+  nextBtn.addEventListener("click", togglearCancionSiguiente);
+  prevBtn.addEventListener("click", togglearCancionAnterior);
+
+  // Controlar la barra de progreso con el mouse
+  progressContainer.addEventListener("click", (e) => {
+    const rect = progressContainer.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const totalWidth = rect.width;
+    const percentage = offsetX / totalWidth;
+    audio.currentTime = percentage * audio.duration;
+  });
+</script>
+</body>
+</html>
