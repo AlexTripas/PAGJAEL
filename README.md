@@ -1,2 +1,0 @@
-# PAGJAEL
-Tarea
